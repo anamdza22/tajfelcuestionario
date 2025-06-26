@@ -95,33 +95,6 @@ if indice < total:
             st.session_state.respondida = False
             st.experimental_rerun()
 
-# Mostrar pregunta actual si no ha terminado el quiz
-if indice < total:
-    pregunta_actual = preguntas[indice]
-    st.subheader(f"Pregunta {indice + 1} de {total}")
-    seleccion = st.radio(
-        pregunta_actual["pregunta"],
-        pregunta_actual["opciones"],
-        key=f"pregunta_{indice}"
-    )
-
-    # Solo muestra el botón si no ha sido respondida
-    if not st.session_state.respondida:
-        if st.button("Responder"):
-            correcta = pregunta_actual["respuesta_correcta"]
-            if pregunta_actual["opciones"].index(seleccion) == correcta:
-                st.success("✅ ¡Correcto!")
-                st.session_state.puntaje += 1
-            else:
-                st.error(f"❌ Incorrecto. La respuesta correcta es: {pregunta_actual['opciones'][correcta]}")
-            st.session_state.respondida = True
-
-    # Solo permite avanzar si fue respondida
-    if st.session_state.respondida:
-        if st.button("Siguiente"):
-            st.session_state.indice += 1
-            st.session_state.respondida = False
-            # No usamos rerun
 else:
     st.balloons()
     st.success(f"🎉 ¡Felicidades por completar el quiz! Obtuviste {st.session_state.puntaje} de {total} respuestas correctas.")
@@ -129,3 +102,4 @@ else:
         st.session_state.indice = 0
         st.session_state.puntaje = 0
         st.session_state.respondida = False
+        st.experimental_rerun()
