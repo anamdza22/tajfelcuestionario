@@ -93,7 +93,7 @@ if indice < total:
         if st.button("Siguiente"):
             st.session_state.indice += 1
             st.session_state.respondida = False
-            st.experimental_rerun()
+            st.rerun()
 
 else:
     st.balloons()
@@ -102,4 +102,4 @@ else:
         st.session_state.indice = 0
         st.session_state.puntaje = 0
         st.session_state.respondida = False
-        st.experimental_rerun()
+        st.rerun()
