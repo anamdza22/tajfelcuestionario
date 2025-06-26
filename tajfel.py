@@ -1,12 +1,6 @@
 import streamlit as st
 
-# Configuración de la app
-st.set_page_config(page_title="Quiz Teoría de Identidad Social", page_icon="🧠")
-
-st.title("🧠 Quiz: Teoría de la Identidad Social de Tajfel")
-st.write("Responde una pregunta a la vez. ¡Buena suerte!")
-
-# Lista de preguntas
+# Preguntas y respuestas
 preguntas = [
     {
         "pregunta": "¿Cuál es el concepto central de la Teoría de la Identidad Social de Tajfel?",
@@ -41,3 +35,97 @@ preguntas = [
     {
         "pregunta": "¿Cuál de los siguientes procesos NO forma parte del desarrollo de la identidad social según Tajfel?",
         "opciones": ["Categorización social", "Comparación social", "Aprendizaje observacional"],
+        "respuesta_correcta": 2
+    },
+    {
+        "pregunta": "¿Qué sucede durante la categorización social?",
+        "opciones": ["Las personas ignoran sus grupos de pertenencia", "Las personas identifican y clasifican a otros en grupos", "Las personas se niegan a aceptar la identidad grupal"],
+        "respuesta_correcta": 1
+    },
+    {
+        "pregunta": "¿Qué fenómeno describe la tendencia a favorecer al grupo propio frente a otros?",
+        "opciones": ["Conformidad social", "Identificación proyectiva", "Favoritismo del endogrupo"],
+        "respuesta_correcta": 2
+    },
+    {
+        "pregunta": "¿Qué estrategia puede usar una persona para mejorar su identidad social cuando su grupo tiene bajo estatus?",
+        "opciones": ["Aislarse del grupo", "Rechazar toda identidad colectiva", "Buscar movilidad social o cambiar la percepción del grupo"],
+        "respuesta_correcta": 2
+    }
+]
+
+st.set_page_config(page_title="Quiz Teoría de Identidad Social", page_icon="🧠")
+
+st.title("🧠 Quiz: Teoría de la Identidad Social de Tajfel")
+st.write("Responde una pregunta a la vez. ¡Buena suerte!")
+
+# Estado de la aplicación
+if "indice" not in st.session_state:
+    st.session_state.indice = 0
+if "puntaje" not in st.session_state:
+    st.session_state.puntaje = 0
+if "respondida" not in st.session_state:
+    st.session_state.respondida = False
+
+indice = st.session_state.indice
+total = len(preguntas)
+
+if indice < total:
+    pregunta_actual = preguntas[indice]
+    st.subheader(f"Pregunta {indice + 1} de {total}")
+    seleccion = st.radio(
+        pregunta_actual["pregunta"],
+        pregunta_actual["opciones"],
+        key=f"pregunta_{indice}"
+    )
+
+    if st.button("Responder", key=f"boton_{indice}") and not st.session_state.respondida:
+        correcta = pregunta_actual["respuesta_correcta"]
+        if pregunta_actual["opciones"].index(seleccion) == correcta:
+            st.success("✅ ¡Correcto!")
+            st.session_state.puntaje += 1
+            st.session_state.respondida = True
+        else:
+            st.error(f"❌ Incorrecto. La respuesta correcta es: {pregunta_actual['opciones'][correcta]}")
+            st.session_state.respondida = True
+
+    if st.session_state.respondida:
+        if st.button("Siguiente"):
+            st.session_state.indice += 1
+            st.session_state.respondida = False
+            st.experimental_rerun()
+
+# Mostrar pregunta actual si no ha terminado el quiz
+if indice < total:
+    pregunta_actual = preguntas[indice]
+    st.subheader(f"Pregunta {indice + 1} de {total}")
+    seleccion = st.radio(
+        pregunta_actual["pregunta"],
+        pregunta_actual["opciones"],
+        key=f"pregunta_{indice}"
+    )
+
+    # Solo muestra el botón si no ha sido respondida
+    if not st.session_state.respondida:
+        if st.button("Responder"):
+            correcta = pregunta_actual["respuesta_correcta"]
+            if pregunta_actual["opciones"].index(seleccion) == correcta:
+                st.success("✅ ¡Correcto!")
+                st.session_state.puntaje += 1
+            else:
+                st.error(f"❌ Incorrecto. La respuesta correcta es: {pregunta_actual['opciones'][correcta]}")
+            st.session_state.respondida = True
+
+    # Solo permite avanzar si fue respondida
+    if st.session_state.respondida:
+        if st.button("Siguiente"):
+            st.session_state.indice += 1
+            st.session_state.respondida = False
+            # No usamos rerun
+else:
+    st.balloons()
+    st.success(f"🎉 ¡Felicidades por completar el quiz! Obtuviste {st.session_state.puntaje} de {total} respuestas correctas.")
+    if st.button("Reiniciar"):
+        st.session_state.indice = 0
+        st.session_state.puntaje = 0
+        st.session_state.respondida = False
