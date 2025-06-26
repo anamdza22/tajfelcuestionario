@@ -109,4 +109,3 @@ else:
         st.session_state.indice = 0
         st.session_state.puntaje = 0
         st.session_state.respondida = False
-
