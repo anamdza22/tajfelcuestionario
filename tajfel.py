@@ -1,6 +1,12 @@
 import streamlit as st
 
-# Preguntas y respuestas
+# Configuración de la app
+st.set_page_config(page_title="Quiz Teoría de Identidad Social", page_icon="🧠")
+
+st.title("🧠 Quiz: Teoría de la Identidad Social de Tajfel")
+st.write("Responde una pregunta a la vez. ¡Buena suerte!")
+
+# Lista de preguntas
 preguntas = [
     {
         "pregunta": "¿Cuál es el concepto central de la Teoría de la Identidad Social de Tajfel?",
@@ -54,12 +60,7 @@ preguntas = [
     }
 ]
 
-st.set_page_config(page_title="Quiz Teoría de Identidad Social", page_icon="🧠")
-
-st.title("🧠 Quiz: Teoría de la Identidad Social de Tajfel")
-st.write("Responde una pregunta a la vez. ¡Buena suerte!")
-
-# Estado de la aplicación
+# Inicialización de variables de sesión
 if "indice" not in st.session_state:
     st.session_state.indice = 0
 if "puntaje" not in st.session_state:
@@ -70,36 +71,42 @@ if "respondida" not in st.session_state:
 indice = st.session_state.indice
 total = len(preguntas)
 
+# Mostrar pregunta actual
 if indice < total:
     pregunta_actual = preguntas[indice]
     st.subheader(f"Pregunta {indice + 1} de {total}")
+    
     seleccion = st.radio(
-        pregunta_actual["pregunta"],
-        pregunta_actual["opciones"],
-        key=f"pregunta_{indice}"
+        label=pregunta_actual["pregunta"],
+        options=pregunta_actual["opciones"],
+        key=f"opciones_{indice}"
     )
 
-    if st.button("Responder", key=f"boton_{indice}") and not st.session_state.respondida:
-        correcta = pregunta_actual["respuesta_correcta"]
-        if pregunta_actual["opciones"].index(seleccion) == correcta:
-            st.success("✅ ¡Correcto!")
-            st.session_state.puntaje += 1
-            st.session_state.respondida = True
-        else:
-            st.error(f"❌ Incorrecto. La respuesta correcta es: {pregunta_actual['opciones'][correcta]}")
+    # Botón para responder
+    if not st.session_state.respondida:
+        if st.button("Responder"):
+            correcta = pregunta_actual["respuesta_correcta"]
+            if pregunta_actual["opciones"].index(seleccion) == correcta:
+                st.success("✅ ¡Correcto!")
+                st.session_state.puntaje += 1
+            else:
+                st.error(f"❌ Incorrecto. La respuesta correcta es: {pregunta_actual['opciones'][correcta]}")
             st.session_state.respondida = True
 
+    # Botón para pasar a la siguiente pregunta
     if st.session_state.respondida:
         if st.button("Siguiente"):
             st.session_state.indice += 1
             st.session_state.respondida = False
-            st.experimental_rerun()
-
+            st.experimental_set_query_params()  # Opcional: limpia URL
 else:
+    # Quiz finalizado
     st.balloons()
-    st.success(f"🎉 ¡Felicidades por completar el quiz! Obtuviste {st.session_state.puntaje} de {total} respuestas correctas.")
+    st.success(f"🎉 ¡Felicidades por completar el quiz!\n\nObtuviste {st.session_state.puntaje} de {total} respuestas correctas.")
+    
+    # Reinicio
     if st.button("Reiniciar"):
         st.session_state.indice = 0
         st.session_state.puntaje = 0
         st.session_state.respondida = False
-        st.experimental_rerun()
+
